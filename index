@@ -1,1 +1,861 @@
 <H1>智慧旅遊導覽</H1>
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI智慧旅遊導覽系統 - 台灣 (Neumorphism)</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <style>
+        /* ========================================= */
+        /* CSS 樣式 (style.css 內容) */
+        /* ========================================= */
+        :root {
+            /* 主要背景色 - 淺灰色調 */
+            --main-color: #e0e5ec; 
+            /* 較淺的陰影顏色 */
+            --light-color: #ffffff;
+            /* 較深的陰影顏色 */
+            --dark-color: #a3b1c6; 
+            /* 主色調 - 用於按鈕或強調 */
+            --primary-color: #4CAF50;
+            --accent-color: #007bff;
+
+            /* Neumorphism 陰影參數 */
+            --shadow-light: -7px -7px 15px var(--light-color);
+            --shadow-dark: 7px 7px 15px var(--dark-color);
+            --shadow-inset-light: inset 5px 5px 10px var(--dark-color);
+            --shadow-inset-dark: inset -5px -5px 10px var(--light-color);
+            --border-radius: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: '微軟正黑體', 'Segoe UI', Tahoma, sans-serif;
+        }
+
+        body {
+            background-color: var(--main-color);
+            padding: 20px;
+        }
+
+        .container {
+            display: grid;
+            /* 佈局: 選單區 (280px) | 主要內容區 (剩餘空間) */
+            grid-template-columns: 280px 1fr; 
+            /* 標題區 | 選單區 / 主要內容區 */
+            grid-template-rows: auto 1fr; 
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* --- 柔和亞克力 (Neumorphism) 基礎樣式 --- */
+
+        .neumorphism-panel,
+        .neumorphism-card {
+            background: var(--main-color);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            /* 標準浮雕效果 */
+            box-shadow: var(--shadow-dark), var(--shadow-light); 
+        }
+
+        /* 讓標題區橫跨兩欄 */
+        .header-panel {
+            grid-column: 1 / -1; 
+            text-align: center;
+            padding: 30px 20px;
+        }
+
+        /* --- API設定區與選單區 --- */
+
+        .api-settings {
+            grid-column: 1 / 2;
+        }
+
+        .sidebar {
+            grid-row: 2 / 3;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* API 輸入框 */
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .neumorphism-input,
+        .neumorphism-select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: none;
+            background: var(--main-color);
+            border-radius: 8px;
+            /* 凹陷效果 */
+            box-shadow: var(--shadow-inset-light), var(--shadow-inset-dark); 
+            transition: all 0.2s ease-in-out;
+        }
+
+        .neumorphism-input:focus,
+        .neumorphism-select:focus {
+            outline: none;
+            /* 輕微的邊框突出，強調聚焦 */
+            box-shadow: inset 2px 2px 5px var(--dark-color), inset -2px -2px 5px var(--light-color); 
+        }
+
+        /* 選單列表 */
+        .menu-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .neumorphism-item {
+            display: block;
+            text-decoration: none;
+            color: #333;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            background: var(--main-color);
+            /* 浮雕效果 */
+            box-shadow: var(--shadow-dark), var(--shadow-light); 
+            transition: all 0.3s ease;
+        }
+
+        .neumorphism-item:hover {
+            /* 懸停時模擬按下的凹陷效果 */
+            box-shadow: var(--shadow-inset-light), var(--shadow-inset-dark); 
+        }
+
+        .neumorphism-item.active {
+            /* 選擇中的項目顯示凹陷 */
+            box-shadow: var(--shadow-inset-light), var(--shadow-inset-dark); 
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .neumorphism-item.disabled {
+            color: #999;
+            cursor: default;
+            box-shadow: none;
+            background: #f0f4f8;
+        }
+
+
+        /* --- 按鈕樣式 --- */
+
+        .neumorphism-button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            background: var(--main-color);
+            /* 浮雕效果 */
+            box-shadow: var(--shadow-dark), var(--shadow-light); 
+            transition: all 0.2s ease-in-out;
+            margin-top: 10px;
+        }
+
+        .neumorphism-button:hover {
+            /* 懸停時讓陰影更明顯，增加互動感 */
+            box-shadow: 10px 10px 20px var(--dark-color), -10px -10px 20px var(--light-color);
+        }
+
+        .neumorphism-button:active {
+            /* 按下時的凹陷效果 */
+            box-shadow: var(--shadow-inset-light), var(--shadow-inset-dark); 
+        }
+
+        /* 主色調按鈕 */
+        .primary-button {
+            color: white;
+            background-color: var(--primary-color);
+            box-shadow: 5px 5px 10px rgba(76, 175, 80, 0.4), -5px -5px 10px rgba(76, 175, 80, 0.7);
+        }
+
+        .accent-button {
+            color: white;
+            background-color: var(--accent-color);
+            box-shadow: 5px 5px 10px rgba(0, 123, 255, 0.4), -5px -5px 10px rgba(0, 123, 255, 0.7);
+        }
+
+        .small-button {
+            padding: 8px 12px;
+            font-size: 0.9em;
+            margin-right: 5px;
+        }
+
+        /* --- 主要內容區 --- */
+
+        .main-content {
+            grid-column: 2 / 3;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* 景點卡片區 */
+        .attraction-cards h2 {
+            margin-bottom: 15px;
+        }
+
+        .cards-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .attraction-card {
+            width: calc(50% - 10px); /* 兩欄佈局 */
+            display: flex;
+            overflow: hidden;
+            /* 初始狀態，由 JS 控制顯示 */
+            display: none; 
+        }
+
+        .card-image-placeholder {
+            width: 40%;
+            min-height: 180px;
+            background-color: #d8dee8;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-style: italic;
+            color: #666;
+            border-radius: var(--border-radius) 0 0 var(--border-radius);
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .card-image-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-content {
+            width: 60%;
+            padding: 15px;
+        }
+
+        .card-content h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .description {
+            margin: 10px 0 15px;
+            color: #555;
+            font-size: 0.9em;
+        }
+
+        /* 地圖展示區 */
+        .map-display {
+            padding: 30px;
+        }
+
+        .map-placeholder {
+            width: 100%;
+            min-height: 400px;
+            background-color: #d8dee8;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #444;
+            /* 地圖區使用凹陷效果 */
+            box-shadow: var(--shadow-inset-light), var(--shadow-inset-dark); 
+            text-align: center;
+            padding: 20px;
+        }
+
+        .route-planning label {
+            display: block;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .route-planning button {
+            width: 100%;
+        }
+
+        pre {
+            white-space: pre-wrap;
+            font-family: monospace;
+            line-height: 1.5;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="neumorphism-panel header-panel">
+            <h1>🇹🇼 AI智慧旅遊導覽系統</h1>
+            <p>透過AI規劃您的台灣之旅，探索精彩景點。</p>
+        </header>
+
+        <section class="api-settings neumorphism-panel">
+            <h2>⚙️ API 設定區</h2>
+            <div class="input-group">
+                <label for="gemini-key">Gemini API Key:</label>
+                <input type="password" id="gemini-key" placeholder="輸入您的API Key" class="neumorphism-input">
+                <p id="api-status" style="font-size: 0.9em; margin-top: 5px;"></p>
+            </div>
+            <button id="verify-api-btn" class="neumorphism-button primary-button">驗證並保存設定</button>
+        </section>
+
+        <nav class="sidebar neumorphism-panel">
+            <h2>🗺️ 路線規劃與景點</h2>
+            
+            <ul class="menu-list" id="category-menu">
+                <li><a href="#" class="neumorphism-item active" data-filter="all">🇹🇼 所有景點</a></li>
+                <li><a href="#" class="neumorphism-item" data-filter="nature">🏞️ 自然風光景點</a></li>
+                <li><a href="#" class="neumorphism-item" data-filter="history">🏛️ 歷史文化古蹟</a></li>
+                <li><a href="#" class="neumorphism-item" data-filter="city">🏙️ 城市都會體驗</a></li>
+            </ul>
+
+            <hr style="border-top: 1px solid #c0c0c0; margin: 15px 0;">
+
+            <div class="route-overview">
+                <h3>📅 AI 行程概覽</h3>
+                <ul id="itinerary-days-menu" class="menu-list">
+                    <li><a href="#" class="neumorphism-item disabled">點擊「生成優化路線」</a></li>
+                </ul>
+            </div>
+
+            <div class="route-planning">
+                <h3>AI 路線生成</h3>
+                
+                <label for="start-location">起始地：</label>
+                <input type="text" id="start-location" placeholder="輸入起點 (e.g., 台北車站)" class="neumorphism-input">
+
+                <label for="interest-tags">旅遊偏好 (Tag)：</label>
+                <input type="text" id="interest-tags" placeholder="自然,美食,歷史..." class="neumorphism-input">
+
+                <label for="duration-days">天數：</label>
+                <select id="duration-days" class="neumorphism-select">
+                    <option value="1">1天</option>
+                    <option value="2">2天</option>
+                    <option value="3" selected>3天</option>
+                    <option value="5">5天</option>
+                </select>
+                
+                <label for="must-visit">必訪景點 (選填)：</label>
+                <input type="text" id="must-visit" placeholder="以逗號分隔 (e.g., 101,日月潭)" class="neumorphism-input">
+
+                <button id="generate-route-btn" class="neumorphism-button accent-button">🔥 生成優化路線</button>
+                
+                <div id="route-result" style="margin-top: 15px; padding: 10px; font-size: 0.9em; display:none;">
+                    </div>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <section class="attraction-cards">
+                <h2>🌟 精選景點卡片</h2>
+                <div id="cards-container" class="cards-container">
+                    </div>
+            </section>
+
+            <section id="map-display" class="map-display neumorphism-panel">
+                <h2>📍 地圖展示區</h2>
+                <div id="map-placeholder" class="map-placeholder">
+                    [地圖模擬畫面：顯示路線和景點標記]
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        /* ========================================= */
+        /* JavaScript 互動邏輯 (script.js 內容) */
+        /* ========================================= */
+
+        // --- 模擬資料 ---
+        const taiwanAttractions = [
+            {
+                id: 'sunmoon',
+                name: '日月潭',
+                description: '臺灣最大的天然湖泊，湖光山色，風景秀麗。每年吸引大量遊客造訪，是國際知名的觀光勝地。',
+                coordinates: 'N 23.8966, E 120.9167',
+                coord_val: { x: 10, y: 15 }, // 模擬地圖上的位置值
+                score: 95, // 吸引力分數
+                tags: ['自然', '湖景', '休閒'],
+                image: 'images/sunmoon_default.jpg' // 初始預設圖片
+            },
+            {
+                id: 'taipei101',
+                name: '台北101',
+                description: '曾為世界第一高樓，是台北市重要的地標。頂樓觀景台可俯瞰大台北都會區的壯麗景色。',
+                coordinates: 'N 25.0330, E 121.5654',
+                coord_val: { x: 5, y: 5 },
+                score: 98,
+                tags: ['城市', '地標', '購物'],
+                image: 'images/taipei101_default.jpg'
+            },
+            {
+                id: 'taroko',
+                name: '太魯閣國家公園',
+                description: '以雄偉壯麗的峽谷景觀聞名。立霧溪切割而成的V形峽谷，是世界級的自然奇觀。',
+                coordinates: 'N 24.1667, E 121.5000',
+                coord_val: { x: 30, y: 25 },
+                score: 92,
+                tags: ['自然', '峽谷', '健行'],
+                image: 'images/taroko_default.jpg'
+            },
+            {
+                id: 'ali',
+                name: '阿里山',
+                description: '五奇（日出、雲海、晚霞、森林、鐵道）聞名中外。',
+                coordinates: 'N 23.5152, E 120.8123',
+                coord_val: { x: 15, y: 35 },
+                score: 90,
+                tags: ['自然', '日出', '森林'],
+                image: 'images/ali_default.jpg'
+            },
+            {
+                id: 'tainan_old',
+                name: '安平古堡',
+                description: '臺灣最古老的城堡之一，見證了臺灣歷史的變遷。',
+                coordinates: 'N 23.0016, E 120.1656',
+                coord_val: { x: 25, y: 10 },
+                score: 88,
+                tags: ['歷史', '文化', '古蹟'],
+                image: 'images/tainan_default.jpg'
+            },
+            {
+                id: 'kaohsiung_harbor',
+                name: '高雄港',
+                description: '臺灣最大的海港，夜晚的燈光景色非常迷人。',
+                coordinates: 'N 22.6167, E 120.2833',
+                coord_val: { x: 20, y: 40 },
+                score: 85,
+                tags: ['城市', '海港', '夜景'],
+                image: 'images/kaohsiung_default.jpg'
+            }
+        ];
+
+        // ✨ 新增全域變數來儲存路線規劃結果
+        let currentOptimizedRoute = null; 
+
+        // --- 輔助函數：生成 Neumorphism 景點卡片 HTML ---
+        function createAttractionCard(attraction) {
+            return `
+                <div class="attraction-card neumorphism-card" data-id="${attraction.id}">
+                    <div class="card-image-placeholder" id="img-placeholder-${attraction.id}">
+                        ${attraction.image.includes('default') 
+                            ? `[AI 生成圖片預覽區]` 
+                            : `<img src="${attraction.image}" alt="${attraction.name}" style="width:100%; height:100%; object-fit:cover;">`}
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">${attraction.name}</h3>
+                        <p class="description card-description-${attraction.id}">${attraction.description.substring(0, 20)}...</p>
+                        <div class="card-details card-details-${attraction.id}" style="display:none; margin-bottom: 10px;">
+                            <p><strong>座標:</strong> <span class="card-coord">${attraction.coordinates}</span></p>
+                        </div>
+                        <button class="neumorphism-button small-button toggle-details-btn" data-id="${attraction.id}">
+                            查看詳情
+                        </button>
+                        <button class="neumorphism-button small-button generate-image-btn" data-name="${attraction.name}">
+                            模擬 AI 生成新圖
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // --- 距離計算 (模擬歐幾里得距離) ---
+        function getDistance(p1, p2) {
+            // 實際應用中，會呼叫地圖 API 獲取行車或步行距離。
+            // 這裡使用簡化的 (x, y) 歐幾里得距離作為模擬。
+            return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
+        }
+
+        // --- 核心功能函數 ---
+
+        // 1. 載入景點卡片
+        function loadAttractionCards() {
+            const container = document.getElementById('cards-container');
+            container.innerHTML = taiwanAttractions.map(createAttractionCard).join('');
+            
+            // 預設顯示所有卡片
+            filterCardsByDay(0);
+        }
+
+        // 2. 處理 API 驗證 (模擬)
+        function handleApiVerification() {
+            const keyInput = document.getElementById('gemini-key');
+            const statusText = document.getElementById('api-status');
+            const key = keyInput.value.trim();
+
+            if (key.length > 10 && key.startsWith('AIZA')) { // 模擬一個簡單的有效鍵格式
+                statusText.innerHTML = '✅ API Key 驗證成功！可使用 AI 功能。';
+                statusText.style.color = 'var(--primary-color)';
+                localStorage.setItem('geminiApiKey', key);
+            } else {
+                statusText.innerHTML = '❌ 請輸入有效的 Gemini API Key。 (模擬格式: AIZA...)';
+                statusText.style.color = 'red';
+                localStorage.removeItem('geminiApiKey');
+            }
+        }
+
+        // 3. 點選景點 (顯示介紹與地圖座標)
+        function toggleDetails(cardId) {
+            const card = taiwanAttractions.find(a => a.id === cardId);
+            const detailsDiv = document.querySelector(`.card-details-${cardId}`);
+            const descriptionP = document.querySelector(`.card-description-${cardId}`);
+            const toggleBtn = document.querySelector(`.toggle-details-btn[data-id="${cardId}"]`);
+
+            if (detailsDiv.style.display === 'none') {
+                detailsDiv.style.display = 'block';
+                descriptionP.innerHTML = card.description;
+                toggleBtn.textContent = '隱藏詳情';
+                updateMapDisplaySingle(card);
+            } else {
+                detailsDiv.style.display = 'none';
+                descriptionP.innerHTML = card.description.substring(0, 20) + '...';
+                toggleBtn.textContent = '查看詳情';
+                // 隱藏詳情後，恢復為顯示多景點 (如果當前是行程視圖)
+                if (document.querySelector('#itinerary-days-menu .active')) {
+                     const activeDay = document.querySelector('#itinerary-days-menu .active').getAttribute('data-day');
+                     filterCardsByDay(activeDay);
+                } else {
+                     updateMapDisplayMultiple([]);
+                }
+            }
+        }
+
+        // 4. 更新地圖展示區 (單一景點)
+        function updateMapDisplaySingle(attraction) {
+            const mapPlaceholder = document.getElementById('map-placeholder');
+            if (attraction) {
+                mapPlaceholder.innerHTML = `
+                    <h3>📌 ${attraction.name} (座標: ${attraction.coordinates})</h3>
+                    <p>地圖模擬：顯示以 ${attraction.name} 為中心的圖資和單一標記。</p>
+                    <p style="color:#007bff; font-weight:normal;">(實際應用中此處會嵌入互動式地圖)</p>
+                `;
+                mapPlaceholder.style.backgroundColor = '#f0f4f8';
+            }
+        }
+
+        // 5. 模擬 AI 生成圖片
+        function simulateAIGeneration(attractionName) {
+            const card = taiwanAttractions.find(a => a.name === attractionName);
+            if (!card) return;
+
+            const imgPlaceholder = document.getElementById(`img-placeholder-${card.id}`);
+            
+            // 檢查 API Key 是否存在 (簡單驗證)
+            if (!localStorage.getItem('geminiApiKey')) {
+                alert('請先在「API 設定區」輸入並驗證 Gemini API Key！');
+                return;
+            }
+            
+            imgPlaceholder.innerHTML = '🖼️ AI 正在生成圖片中...';
+            imgPlaceholder.style.backgroundColor = '#e0f7fa';
+
+            // 模擬網路延遲和 AI 生成時間
+            setTimeout(() => {
+                // 模擬生成一張新圖片 (這裡只是替換成一個不同的 URL)
+                const newImageUrl = `https://picsum.photos/seed/${Math.random()}/300/200`;
+                
+                // 更新卡片內部的圖片
+                imgPlaceholder.innerHTML = `<img src="${newImageUrl}" alt="AI 生成的 ${attractionName} 圖片" style="width:100%; height:100%; object-fit:cover;">`;
+                imgPlaceholder.style.backgroundColor = '#d8dee8';
+                
+                card.image = newImageUrl;
+
+            }, 2000); // 延遲 2 秒
+        }
+        
+        // 6. 複雜路線規劃函數 (模擬貪婪法與篩選)
+        function generateOptimizedRoute(startLocation, interestTags, durationDays, mustVisitNames) {
+            const totalDays = parseInt(durationDays, 10);
+            const requiredTags = interestTags.split(',').map(tag => tag.trim().toLowerCase()).filter(t => t);
+            const mustVisit = mustVisitNames.split(',').map(name => name.trim()).filter(n => n);
+            
+            // 1. 篩選景點 (根據標籤和必訪)
+            let filteredAttractions = taiwanAttractions.filter(attraction => {
+                const tagMatch = requiredTags.length === 0 || attraction.tags.some(tag => requiredTags.includes(tag.toLowerCase()));
+                return tagMatch;
+            });
+
+            let selectedRoute = taiwanAttractions.filter(a => mustVisit.includes(a.name));
+            let pool = filteredAttractions.filter(a => !mustVisit.includes(a.name));
+
+            // 2. 選擇足夠的景點 (假設每天最多訪問 3 個景點)
+            const maxAttractions = totalDays * 3;
+            
+            pool.sort((a, b) => b.score - a.score);
+            
+            for (let i = 0; selectedRoute.length < maxAttractions && i < pool.length; i++) {
+                selectedRoute.push(pool[i]);
+            }
+
+            if (selectedRoute.length === 0) {
+                return "找不到符合您條件的景點。";
+            }
+
+            // 3. 路線優化 (貪婪法模擬)
+            let optimizedOrder = [];
+            let currentPoint = { name: startLocation, coord_val: { x: 20, y: 10 } }; // 模擬起點座標
+            let remaining = [...selectedRoute];
+
+            while (remaining.length > 0) {
+                let nearestIndex = -1;
+                let minDistance = Infinity;
+
+                for (let i = 0; i < remaining.length; i++) {
+                    const dist = getDistance(currentPoint.coord_val, remaining[i].coord_val);
+                    if (dist < minDistance) {
+                        minDistance = dist;
+                        nearestIndex = i;
+                    }
+                }
+                
+                const nextAttraction = remaining.splice(nearestIndex, 1)[0];
+                optimizedOrder.push(nextAttraction);
+                currentPoint = nextAttraction;
+            }
+
+            // 4. 分日規劃
+            const attractionsPerDay = Math.ceil(optimizedOrder.length / totalDays);
+            let itinerary = [];
+            let dailyStops = []; // 儲存每日景點清單
+            let totalDistance = 0;
+
+            for (let day = 0; day < totalDays; day++) {
+                const startIndex = day * attractionsPerDay;
+                const stops = optimizedOrder.slice(startIndex, startIndex + attractionsPerDay);
+                
+                if (stops.length > 0) {
+                    dailyStops.push(stops);
+
+                    let dailyRoute = [`從 ${day === 0 ? startLocation : '前一天住宿地點'} 出發`];
+                    let lastCoord = day === 0 ? { x: 20, y: 10 } : stops[0].coord_val;
+                    
+                    stops.forEach((stop) => {
+                        const travelDist = getDistance(lastCoord, stop.coord_val);
+                        totalDistance += travelDist;
+                        
+                        dailyRoute.push(`➡️ 訪問 ${stop.name} (停留約 3小時，行車距離模擬: ${travelDist.toFixed(1)} km)`);
+                        lastCoord = stop.coord_val;
+                    });
+
+                    dailyRoute.push(`🛌 晚上在 ${stops[stops.length - 1].name} 附近住宿。`);
+                    itinerary.push(`**第 ${day + 1} 天:**\n* ` + dailyRoute.join('\n* '));
+                }
+            }
+
+            return { 
+                itinerary: itinerary.join('\n\n'), 
+                totalDistance: totalDistance.toFixed(1),
+                dailyStops: dailyStops
+            };
+        }
+
+        // 7. 輔助函數：更新行程概覽側邊欄
+        function updateSidebarOverview(dailyStops) {
+            const menu = document.getElementById('itinerary-days-menu');
+            menu.innerHTML = '';
+            
+            if (!dailyStops || dailyStops.length === 0) {
+                menu.innerHTML = '<li><a href="#" class="neumorphism-item disabled">點擊「生成優化路線」</a></li>';
+                filterCardsByDay(0); 
+                return;
+            }
+
+            menu.innerHTML += `
+                <li>
+                    <a href="#" class="neumorphism-item route-day-btn active" data-day="all">
+                        👁️ 顯示所有行程景點
+                    </a>
+                </li>
+            `;
+
+            dailyStops.forEach((dayStops, index) => {
+                const day = index + 1;
+                const totalStops = dayStops.length;
+                
+                menu.innerHTML += `
+                    <li>
+                        <a href="#" class="neumorphism-item route-day-btn" data-day="${day}">
+                            🗓️ 第 ${day} 天 (${totalStops} 站)
+                        </a>
+                    </li>
+                `;
+            });
+        }
+        
+        // 8. 輔助函數：根據天數篩選景點卡片
+        function filterCardsByDay(day) {
+            const allCards = document.querySelectorAll('.attraction-card');
+            
+            let visibleIds = [];
+            let attractionsToShow = [];
+
+            if (day === 0) { // 顯示所有原始卡片 (無行程)
+                allCards.forEach(card => card.style.display = 'flex');
+                updateMapDisplayMultiple([]);
+                return;
+            } else if (day === 'all' && currentOptimizedRoute) { // 顯示所有行程景點
+                attractionsToShow = currentOptimizedRoute.flat();
+            } else if (currentOptimizedRoute && day > 0) { // 顯示指定天數的景點
+                const dayIndex = day - 1;
+                if (currentOptimizedRoute[dayIndex]) {
+                    attractionsToShow = currentOptimizedRoute[dayIndex];
+                }
+            }
+            
+            visibleIds = attractionsToShow.map(a => a.id);
+            
+            allCards.forEach(card => {
+                const cardId = card.getAttribute('data-id');
+                card.style.display = visibleIds.includes(cardId) ? 'flex' : 'none';
+            });
+
+            updateMapDisplayMultiple(attractionsToShow);
+        }
+        
+        // 9. 輔助函數：更新地圖展示區 (多景點模式)
+        function updateMapDisplayMultiple(attractions) {
+            const mapPlaceholder = document.getElementById('map-placeholder');
+            const color = attractions.length > 0 ? '#f0f4f8' : '#d8dee8';
+            
+            if (attractions && attractions.length > 0) {
+                const attractionNames = attractions.map(a => a.name).join(' -> ');
+                mapPlaceholder.innerHTML = `
+                    <h3>🗺️ 當前行程地圖視圖</h3>
+                    <p>地圖模擬：顯示 ${attractions.length} 個景點並標記路線:</p>
+                    <p style="font-weight:normal;">${attractionNames}</p>
+                    <p style="color:#007bff; font-weight:normal;">(實際應用中此處會顯示行程連線圖)</p>
+                `;
+            } else {
+                mapPlaceholder.innerHTML = '[地圖模擬畫面：顯示路線和景點標記]';
+            }
+            mapPlaceholder.style.backgroundColor = color;
+        }
+
+        // --- 事件監聽器設定 ---
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // 1. 載入景點卡片
+            loadAttractionCards();
+
+            // 2. API 驗證按鈕
+            document.getElementById('verify-api-btn').addEventListener('click', handleApiVerification);
+
+            // 3. 景點卡片區的事件委派 (處理所有卡片按鈕)
+            document.getElementById('cards-container').addEventListener('click', (event) => {
+                const target = event.target;
+
+                if (target.classList.contains('toggle-details-btn')) {
+                    const cardId = target.getAttribute('data-id');
+                    toggleDetails(cardId);
+                } else if (target.classList.contains('generate-image-btn')) {
+                    const attractionName = target.getAttribute('data-name');
+                    simulateAIGeneration(attractionName);
+                }
+            });
+            
+            // 4. 複雜路線規劃按鈕
+            document.getElementById('generate-route-btn').addEventListener('click', () => {
+                const start = document.getElementById('start-location').value || '台灣任一地點';
+                const tags = document.getElementById('interest-tags').value;
+                const days = document.getElementById('duration-days').value;
+                const must = document.getElementById('must-visit').value;
+                const resultDiv = document.getElementById('route-result');
+
+                // 檢查是否已驗證 API Key
+                if (!localStorage.getItem('geminiApiKey')) {
+                    resultDiv.style.display = 'block';
+                    resultDiv.innerHTML = '<p style="color:red;">請先驗證您的 Gemini API Key 才能使用 AI 規劃功能！</p>';
+                    return;
+                }
+
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = '<p>🚀 AI 正在處理複雜的旅行推銷員問題 (TSP)...</p>';
+                resultDiv.style.backgroundColor = '#f0f4f8';
+                
+                // 模擬延遲，並運行優化器
+                setTimeout(() => {
+                    const routeData = generateOptimizedRoute(start, tags, days, must);
+
+                    if (typeof routeData === 'string') {
+                        resultDiv.innerHTML = `<p style="color:red;">${routeData}</p>`;
+                        currentOptimizedRoute = null;
+                        updateSidebarOverview(null);
+
+                    } else {
+                        resultDiv.innerHTML = `
+                            <h4>✅ 最佳化行程 (共 ${routeData.totalDistance} km 模擬距離)</h4>
+                            <pre style="white-space: pre-wrap; background: #e0e5ec; padding: 10px; border-radius: 8px;">${routeData.itinerary}</pre>
+                            <p><em>此路線已根據您的偏好和地理位置採用貪婪法進行優化。</em></p>
+                        `;
+                        
+                        currentOptimizedRoute = routeData.dailyStops;
+                        updateSidebarOverview(routeData.dailyStops);
+                        
+                        // 預設顯示第一天的景點
+                        filterCardsByDay(1); 
+                        
+                        // 確保將第一天按鈕設為 active
+                        document.querySelectorAll('.route-day-btn').forEach(btn => btn.classList.remove('active'));
+                        document.querySelector('.route-day-btn[data-day="1"]').classList.add('active');
+                    }
+                    resultDiv.style.backgroundColor = 'var(--main-color)';
+                }, 1500);
+            });
+            
+            // 5. 行程概覽菜單事件委派
+            document.getElementById('itinerary-days-menu').addEventListener('click', (event) => {
+                const target = event.target.closest('.route-day-btn');
+                if (target && !target.classList.contains('disabled')) {
+                    event.preventDefault();
+
+                    document.querySelectorAll('.route-day-btn').forEach(btn => btn.classList.remove('active'));
+                    document.querySelectorAll('#category-menu a').forEach(btn => btn.classList.remove('active'));
+                    
+                    target.classList.add('active');
+                    
+                    const day = target.getAttribute('data-day');
+                    
+                    if (day === 'all') {
+                        filterCardsByDay('all');
+                    } else {
+                        filterCardsByDay(parseInt(day, 10));
+                    }
+                }
+            });
+
+            // 6. 原始分類選單事件 (顯示所有景點，並重置行程概覽)
+            document.getElementById('category-menu').addEventListener('click', (event) => {
+                const target = event.target.closest('a');
+                if (target) {
+                    event.preventDefault();
+
+                    document.querySelectorAll('#category-menu a').forEach(btn => btn.classList.remove('active'));
+                    document.querySelectorAll('.route-day-btn').forEach(btn => btn.classList.remove('active'));
+
+                    target.classList.add('active');
+                    
+                    // 重置，顯示所有景點
+                    filterCardsByDay(0);
+                    updateMapDisplayMultiple([]);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
